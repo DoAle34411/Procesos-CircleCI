@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "eslint .",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "build": "node ./build.js"
+    "build": "node ./build.js",
+    "dev": "node src/index.js"
   },
   "keywords": [],
   "author": "",

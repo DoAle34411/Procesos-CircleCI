@@ -7,9 +7,9 @@ mkdirSync("dist", { recursive: true });
   await build({
     entryPoints: ["src/index.js"],
     bundle: true,
-    outfile: "dist/bundle.js",
-    platform: "node",      // or "browser"
+    platform: "node", // or "browser"
     target: "es2020",
+    outfile: "dist/bundle.js",
     minify: true,
     sourcemap: true
   });
