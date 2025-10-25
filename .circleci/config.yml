@@ -39,14 +39,28 @@ jobs:
           command: npm test
 
   build:
-    name: Build project 
-    command: npm run build
+    docker:
+      - image: cimg/node:22.0
+    working_directory: ~/project
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Build project
+          command: npm run build
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - build
+            - dist
 
   trigger_webhook:
     docker:
       - image: cimg/base:stable
     working_directory: ~/project
     steps:
+      - attach_workspace:
+          at: ~/project
       - run:
           name: Trigger Power Automate Webhook
           when: always
@@ -73,7 +87,6 @@ workflows:
       - trigger_webhook:
           requires:
             - build
-          # This ensures webhook runs even if previous jobs fail
           filters:
             branches:
               only: /.*/
