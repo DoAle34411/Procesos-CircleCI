@@ -1,0 +1,42 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: cimg/node:22.0  # CircleCI Node.js image (Linux-based, fine for JS builds)
+    working_directory: ~/project
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install dependencies
+          command: npm ci
+
+      - run:
+          name: Lint code
+          command: npm run lint
+
+      - run:
+          name: Run Jest tests
+          command: npm test
+
+      - run:
+          name: Build project
+          command: npm run build
+
+      # This step always runs — even if previous ones failed
+      - run:
+          name: Trigger Power Automate Webhook
+          when: always
+          command: |
+            echo "Triggering Power Automate webhook..."
+            curl -X POST -s -o /dev/null -w "%{http_code}" \
+              "https://default585a4d92db1d4bbbb5acc5299e3894.e3.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/fb222fd4e1d04ff8a1a6d444439d0dc4/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=PyOLJhpm9RxhKuCjwgpNRZl4cX-VGg1aBXtKLM0VELs" \
+              || true
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build
