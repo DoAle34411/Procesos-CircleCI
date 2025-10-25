@@ -39,19 +39,8 @@ jobs:
           command: npm test
 
   build:
-    docker:
-      - image: cimg/node:22.0
-    working_directory: ~/project
-    steps:
-      - attach_workspace:
-          at: ~/project
-      - run:
-          name: Build project
-          command: npm run build
-      - persist_to_workspace:
-          root: ~/project
-          paths:
-            - build
+    name: Build project 
+    command: npm run build
 
   trigger_webhook:
     docker:
