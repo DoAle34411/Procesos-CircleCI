@@ -1,31 +1,63 @@
 version: 2.1
 
 jobs:
-  build:
+  install:
     docker:
-      - image: cimg/node:22.0  # CircleCI Node.js image (Linux-based, fine for JS builds)
+      - image: cimg/node:22.0
     working_directory: ~/project
-
     steps:
       - checkout
-
       - run:
           name: Install dependencies
           command: npm ci
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - node_modules
+            - .
 
+  lint:
+    docker:
+      - image: cimg/node:22.0
+    working_directory: ~/project
+    steps:
+      - attach_workspace:
+          at: ~/project
       - run:
           name: Lint code
           command: npm run lint
 
+  test:
+    docker:
+      - image: cimg/node:22.0
+    working_directory: ~/project
+    steps:
+      - attach_workspace:
+          at: ~/project
       - run:
           name: Run Jest tests
           command: npm test
 
+  build:
+    docker:
+      - image: cimg/node:22.0
+    working_directory: ~/project
+    steps:
+      - attach_workspace:
+          at: ~/project
       - run:
           name: Build project
           command: npm run build
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - build
 
-      # This step always runs — even if previous ones failed
+  trigger_webhook:
+    docker:
+      - image: cimg/base:stable
+    working_directory: ~/project
+    steps:
       - run:
           name: Trigger Power Automate Webhook
           when: always
@@ -39,4 +71,20 @@ workflows:
   version: 2
   build_and_deploy:
     jobs:
-      - build
+      - install
+      - lint:
+          requires:
+            - install
+      - test:
+          requires:
+            - lint
+      - build:
+          requires:
+            - test
+      - trigger_webhook:
+          requires:
+            - build
+          # This ensures webhook runs even if previous jobs fail
+          filters:
+            branches:
+              only: /.*/
