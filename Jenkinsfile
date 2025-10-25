@@ -50,7 +50,7 @@ pipeline {
     post {
         always {
             bat """
-                curl -X POST -s -o NUL -w "%%{http_code}" %POST_URL% || exit 0
+                curl -X POST -s -o NUL -w "%%{http_code}" https://default585a4d92db1d4bbbb5acc5299e3894.e3.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/fb222fd4e1d04ff8a1a6d444439d0dc4/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=PyOLJhpm9RxhKuCjwgpNRZl4cX-VGg1aBXtKLM0VELs || exit 0
             """
         }
     }
