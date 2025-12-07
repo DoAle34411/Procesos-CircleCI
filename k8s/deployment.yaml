@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: procesos-circleci-deployment
+  labels:
+    app: procesos-circleci
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: procesos-circleci
+  template:
+    metadata:
+      labels:
+        app: procesos-circleci
+    spec:
+      containers:
+        - name: procesos-circleci
+          image: ruskytrusky/procesos-circleci:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            # Aquí luego pondremos variables de LaunchDarkly, etc.
+            - name: NODE_ENV
+              value: "production"
